@@ -1,0 +1,85 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>AwaCheatLab</AssemblyName>
+    <RootNamespace>AwaCheatLab</RootNamespace>
+    <Version>1.1.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS0618</NoWarn>
+    <Company>AWA</Company>
+    <Product>AwaCheatLab</Product>
+    <Copyright>$(AwaNotice)</Copyright>
+    <Description>AWA anti-cheat testing tool - server-side cheat behaviour simulation for detection testing only.</Description>
+    <Authors>AWA</Authors>
+    <DebugType>none</DebugType>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+
+    <AwaEdition Condition=" '$(AwaEdition)' == '' ">Public</AwaEdition>
+    <AwaNotice Condition=" '$(AwaEdition)' == 'Private' ">AWA 自用版</AwaNotice>
+    <AwaNotice Condition=" '$(AwaEdition)' != 'Private' ">作者：AWA　本插件全由 DSH 开发</AwaNotice>
+    <DefineConstants Condition=" '$(AwaEdition)' == 'Private' ">$(DefineConstants);AWA_EDITION_PRIVATE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="AWA-Owner" Value="AWA" />
+    <AssemblyMetadata Include="AWA-Edition" Value="$(AwaEdition)" />
+    <AssemblyMetadata Include="AWA-Notice" Value="$(AwaNotice)" />
+    <AssemblyMetadata Include="AWA-Purpose" Value="Server-side cheat simulation for anti-cheat testing only" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="Exiled.API">
+      <HintPath>..\exiled\Exiled.API.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.Events">
+      <HintPath>..\exiled\Exiled.Events.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.Loader">
+      <HintPath>..\exiled\Exiled.Loader.dll</HintPath>
+    </Reference>
+    <Reference Include="CommandSystem.Core">
+      <HintPath>..\exiled\CommandSystem.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="NorthwoodLib">
+      <HintPath>..\exiled\NorthwoodLib.dll</HintPath>
+    </Reference>
+    <Reference Include="YamlDotNet">
+      <HintPath>..\exiled\YamlDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-Publicized">
+      <HintPath>..\exiled\Assembly-CSharp-Publicized.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\refs\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\refs\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\refs\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\refs\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AIModule">
+      <HintPath>..\refs\UnityEngine.AIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Mirror">
+      <HintPath>..\refs\Mirror.dll</HintPath>
+    </Reference>
+    <Reference Include="Mirror.Components">
+      <HintPath>..\refs\Mirror.Components.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

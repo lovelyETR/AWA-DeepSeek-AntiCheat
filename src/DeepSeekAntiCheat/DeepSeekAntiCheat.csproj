@@ -1,0 +1,131 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>DeepSeekAntiCheat</AssemblyName>
+    <RootNamespace>DeepSeekAntiCheat</RootNamespace>
+    <Version>1.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS0618</NoWarn>
+    <Company>AWA</Company>
+    <Product>DeepSeekAntiCheat ($(AwaEdition))</Product>
+    <Copyright>$(AwaNotice)</Copyright>
+    <Description>AWA :: DeepSeekAntiCheat [$(AwaEdition)] —— SCP: Secret Laboratory 的 EXILED 反作弊插件（DeepSeek 辅助）。</Description>
+    <Authors>AWA</Authors>
+    <DebugType>none</DebugType>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+
+    <!--
+      AWA 版本开关。同一套代码，只在水印字符串上分叉：
+        -p:AwaEdition=Public   公共版（发出去）  作者：AWA / 本插件全由 DSH 开发
+        -p:AwaEdition=Private  自用版（自己用）  AWA 自用版
+      默认 Public。逻辑代码两边完全相同，只有水印文案不同。
+    -->
+    <AwaEdition Condition="'$(AwaEdition)' == ''">Public</AwaEdition>
+    <AwaNotice Condition="'$(AwaEdition)' == 'Private'">AWA 自用版</AwaNotice>
+    <AwaNotice Condition="'$(AwaEdition)' != 'Private'">作者：AWA　本插件全由 DSH 开发</AwaNotice>
+    <DefineConstants Condition="'$(AwaEdition)' == 'Private'">$(DefineConstants);AWA_EDITION_PRIVATE</DefineConstants>
+  </PropertyGroup>
+
+  <!--
+    AWA 水印：这些元数据会写进程序集，
+    用 strings / ILSpy / dotPeek 打开 DLL 就能看到。
+    摘掉它们需要逐个特性删除，不是一次查找替换能解决的。
+  -->
+  <ItemGroup>
+    <AssemblyMetadata Include="AWA-Owner" Value="AWA" />
+    <AssemblyMetadata Include="AWA-Edition" Value="$(AwaEdition)" />
+    <AssemblyMetadata Include="AWA-Notice" Value="$(AwaNotice)" />
+  </ItemGroup>
+
+  <!--
+    测试钻取（Drill.cs）只编进自用版。
+    公共版不包含任何注入能力 —— 需要测试的人用独立的反作弊测试插件 AwaCheatLab。
+  -->
+  <ItemGroup Condition="'$(AwaEdition)' != 'Private'">
+    <Compile Remove="Drill.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- net48 自带的 JSON 序列化器，避免引入 Newtonsoft 的版本冲突 -->
+  <ItemGroup>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <!-- EXILED 框架 -->
+  <ItemGroup>
+    <Reference Include="Exiled.API">
+      <HintPath>..\exiled\Exiled.API.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Exiled.Events">
+      <HintPath>..\exiled\Exiled.Events.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Exiled.Loader">
+      <HintPath>..\exiled\Exiled.Loader.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="CommandSystem.Core">
+      <HintPath>..\exiled\CommandSystem.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="NorthwoodLib">
+      <HintPath>..\exiled\NorthwoodLib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="YamlDotNet">
+      <HintPath>..\exiled\YamlDotNet.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- 游戏程序集（已 publicize，EXILED 开发用） -->
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp-Publicized">
+      <HintPath>..\exiled\Assembly-CSharp-Publicized.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- MEC 协程库（Exiled 用 Timing.RunCoroutine 做跨线程回投） -->
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\refs\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Unity 引擎模块 -->
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>..\refs\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\refs\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\refs\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AIModule">
+      <HintPath>..\refs\UnityEngine.AIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Mirror">
+      <HintPath>..\refs\Mirror.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Mirror.Components">
+      <HintPath>..\refs\Mirror.Components.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

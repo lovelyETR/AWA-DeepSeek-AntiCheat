@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Condition="'$(AwaEdition)' == 'Private'">
+    <DefineConstants>$(DefineConstants);AWA_EDITION_PRIVATE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>LogicTests</AssemblyName>
+    <RootNamespace>LogicTests</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <!-- 直接链接插件源码（不含 Plugin.cs，避免依赖游戏运行时） -->
+  <ItemGroup>
+    <Compile Include="..\DeepSeekAntiCheat\Config.cs" />
+    <Compile Include="..\DeepSeekAntiCheat\Punishment.cs" />
+    <Compile Include="..\DeepSeekAntiCheat\ServerFeatures.cs" />
+    <Compile Include="..\DeepSeekAntiCheat\PlayerStats.cs" />
+    <Compile Include="..\DeepSeekAntiCheat\Heuristics.cs" />
+    <Compile Include="..\DeepSeekAntiCheat\DeepSeekClient.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Exiled.API">
+      <HintPath>..\exiled\Exiled.API.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
