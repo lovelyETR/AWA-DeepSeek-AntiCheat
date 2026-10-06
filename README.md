@@ -218,7 +218,7 @@ features:
 
 `ai-proxy` 是一个独立的、引擎无关的开源项目：
 
-> **https://github.com/AWA/ai-proxy**
+> **https://github.com/lovelyETR/ai-proxy**
 
 它说的是 OpenAI 兼容格式，所以任何引擎、任何语言的插件都能接
 （起源引擎 / Unity / 虚幻 / 寒霜 / GMod / FiveM / Minecraft / Godot ...）。
@@ -237,7 +237,7 @@ api_key: 'my-token-1'          # 令牌，不是真 Key
 ## 从源码构建
 
 ```bash
-git clone https://github.com/AWA/AWA-DeepSeek-AntiCheat.git
+git clone https://github.com/lovelyETR/AWA-DeepSeek-AntiCheat.git
 cd AWA-DeepSeek-AntiCheat
 
 # 自用版（默认处置 Kill，含测试钻取命令）
