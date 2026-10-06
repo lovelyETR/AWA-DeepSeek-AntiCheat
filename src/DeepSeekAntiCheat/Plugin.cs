@@ -93,10 +93,9 @@ namespace DeepSeekAntiCheat
         /// </summary>
         private void RegisterCommandsExplicitly()
         {
-            Log.Info(string.Format(
-                CultureInfo.InvariantCulture,
-                "[{0}] 命令名: dsac    别名: deepseekanticheat",
-                AwaWatermark.Owner));
+            // 命令注册交给 EXILED 自己处理（见 [CommandHandler] 特性）。
+            // 这里以前会再注册一次，导致 "Command with same name has already registered!"，
+            // 现在什么都不做。
         }
         /// <summary>插件卸载时反注册命令。</summary>
         private void UnregisterCommandsExplicitly()
