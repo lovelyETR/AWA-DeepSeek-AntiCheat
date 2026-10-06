@@ -5,7 +5,7 @@
 
 ---
 
-## [Alpha v1.0] —— 首个公开版本
+## [Alpha v1.1] —— 首个公开版本
 
 ### 反作弊插件 `DeepSeekAntiCheat`
 

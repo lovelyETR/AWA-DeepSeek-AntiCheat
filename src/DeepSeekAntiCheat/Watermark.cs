@@ -31,7 +31,7 @@ namespace DeepSeekAntiCheat
 #endif
 
         /// <summary>版本号。Alpha 用英文标注。</summary>
-        internal const string EditionVersion = "Alpha v1.0";
+        internal const string EditionVersion = "Alpha v1.1";
 
         /// <summary>项目名。</summary>
         internal const string Project = "DeepSeekAntiCheat";

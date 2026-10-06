@@ -110,6 +110,31 @@ namespace DeepSeekAntiCheat
         public List<DateTime> RecentItemTimes { get; } = new List<DateTime>();
 
         /// <summary>当前滑动窗口内的物品数。</summary>
+        /// <summary>检测到刷物品后，在这个时刻之前新获得的物品全部收掉。</summary>
+        public DateTime ItemSpamBlockedUntil { get; set; } = DateTime.MinValue;
+
+        /// <summary>被封堵收掉的物品件数。</summary>
+        public int BlockedItems { get; set; }
+
+        // ───────────── 透视预判 ─────────────
+
+        /// <summary>最近一次「瞄着看不见的敌人」的时刻（滑动窗口用）。</summary>
+        public List<DateTime> RecentPredictionTimes { get; } = new List<DateTime>();
+
+        /// <summary>窗口内的预判次数。</summary>
+        public int PredictionsInWindow { get; set; }
+
+        /// <summary>预判总次数。</summary>
+        public int PredictionCount { get; set; }
+
+        /// <summary>当前连续预判次数。</summary>
+        public int PredictionStreak { get; set; }
+
+        /// <summary>最长连续预判次数。</summary>
+        public int MaxPredictionStreak { get; set; }
+
+        /// <summary>预判详情（用于日志与证据）。</summary>
+        public string PredictionDetail { get; set; }
         public int ItemsInWindow { get; set; }
 
         /// <summary>是否已判定为刷物品。</summary>
@@ -153,6 +178,35 @@ namespace DeepSeekAntiCheat
             return this.ItemsInWindow;
         }
 
+        /// <summary>
+        /// 记录一次「瞄着看不见的敌人」。返回窗口内累计次数。
+        /// </summary>
+        public int RecordPrediction(int windowSeconds)
+        {
+            DateTime now = DateTime.UtcNow;
+            this.PredictionCount++;
+            this.RecentPredictionTimes.Add(now);
+
+            DateTime cutoff = now.AddSeconds(-Math.Max(1, windowSeconds));
+            while (this.RecentPredictionTimes.Count > 0 && this.RecentPredictionTimes[0] < cutoff)
+            {
+                this.RecentPredictionTimes.RemoveAt(0);
+            }
+
+            while (this.RecentPredictionTimes.Count > 500)
+            {
+                this.RecentPredictionTimes.RemoveAt(0);
+            }
+
+            this.PredictionsInWindow = this.RecentPredictionTimes.Count;
+            return this.PredictionsInWindow;
+        }
+
+        /// <summary>重置连续预判计数。</summary>
+        public void BreakPredictionStreak()
+        {
+            this.PredictionStreak = 0;
+        }
         /// <summary>记录一条移动异常（最多留 5 条）。</summary>
         public void AddMoveViolation(string detail)
         {

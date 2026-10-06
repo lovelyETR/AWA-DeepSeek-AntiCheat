@@ -1045,6 +1045,63 @@ namespace DeepSeekAntiCheat
                         maxSpeed = float.MaxValue;
                     }
 
+                    // ── 透视预判采样 ──
+                    // 统计「准星是否总对着他看不见的敌人」。
+                    // 服务端看不到渲染，这是间接推断；靠次数门槛过滤运气与预瞄。
+                    if (this.Config.DetectEspPrediction)
+                    {
+                        foreach (Player ap in Player.List)
+                        {
+                            if (ap == null || !ap.IsConnected || ap.IsNPC || ap.IsHost)
+                            {
+                                continue;
+                            }
+
+                            try
+                            {
+                                PlayerStats ast = this.GetStats(ap);
+
+                                if (AimWatch.Sample(this.Config, ap, Player.List))
+                                {
+                                    int inWin = ast.RecordPrediction(this.Config.EspPredictionWindowSeconds);
+                                    ast.PredictionStreak++;
+                                    if (ast.PredictionStreak > ast.MaxPredictionStreak)
+                                    {
+                                        ast.MaxPredictionStreak = ast.PredictionStreak;
+                                    }
+
+                                    ast.PredictionDetail = string.Format(
+                                        CultureInfo.InvariantCulture,
+                                        "{0} 秒内 {1} 次（最长连续 {2} 次）",
+                                        this.Config.EspPredictionWindowSeconds,
+                                        inWin, ast.MaxPredictionStreak);
+
+                                    if (inWin == this.Config.EspPredictionThreshold)
+                                    {
+                                        ast.LogEvent("透视预判", ast.PredictionDetail);
+                                        Log.Warn(string.Format(
+                                            CultureInfo.InvariantCulture,
+                                            "[{0}] 预判异常: {1} —— {2}",
+                                            AwaWatermark.Owner, ap.Nickname, ast.PredictionDetail));
+                                    }
+
+                                    if (inWin >= this.Config.EspPredictionHard)
+                                    {
+                                        this.MaybeReview(ast);
+                                    }
+                                }
+                                else
+                                {
+                                    ast.BreakPredictionStreak();
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Debug("[AWA] 透视预判采样失败: " + e.Message);
+                            }
+                        }
+                    }
+
                     float teleportDist = (fm != null && fm.CustomTeleport) ? float.MaxValue : this.Config.TeleportDistance;
 
                     found = this.movement.Tick(
@@ -1206,7 +1263,21 @@ namespace DeepSeekAntiCheat
                 return;
             }
 
+            // NPC / 本地玩家不算
+            if (ev.Player.IsNPC || ev.Player.IsHost)
+            {
+                return;
+            }
+
             PlayerStats st = this.GetStats(ev.Player);
+
+            // ── 封堵窗口：刚判定过刷物品，接下来一段时间里新拿到的物品直接收掉 ──
+            // 否则「清空背包」只清那一瞬间，作弊者接着刷还是能拿到东西。
+            if (this.Config.BlockItemsAfterSpam && DateTime.UtcNow < st.ItemSpamBlockedUntil)
+            {
+                this.BlockItem(ev.Player, ev.Item, st);
+                return;
+            }
 
             // 按「滑动窗口内拿了多少件」判断，而不是累计总数 ——
             // 累计总数对正常玩家也会慢慢涨上去，窗口计数才能识别刷物品。
@@ -1255,6 +1326,12 @@ namespace DeepSeekAntiCheat
                 "[{0}] 检测到刷物品: {1} —— {2}",
                 AwaWatermark.Owner, ev.Player.Nickname, st.ItemSpamDetail));
 
+            // 设定封堵窗口：接下来这段时间里新拿到的物品会被逐件收掉
+            if (this.Config.BlockItemsAfterSpam)
+            {
+                st.ItemSpamBlockedUntil = DateTime.UtcNow.AddSeconds(Math.Max(1, this.Config.ItemSpamBlockSeconds));
+            }
+
             // 直接清空背包（可逆处置，不走 AI、不等阈值）
             if (this.Config.ClearInventoryOnItemSpam)
             {
@@ -1297,6 +1374,36 @@ namespace DeepSeekAntiCheat
             }
         }
 
+        /// <summary>
+        /// 收掉一件刚拿到的物品（封堵窗口内用）。
+        ///
+        /// 事件本身不能撤销，所以是「先让它进来，再立刻拿走」。
+        /// </summary>
+        private void BlockItem(Player target, Exiled.API.Features.Items.Item item, PlayerStats st)
+        {
+            try
+            {
+                if (target == null || item == null)
+                {
+                    return;
+                }
+
+                target.RemoveItem(item, true);
+                st.BlockedItems++;
+
+                if (st.BlockedItems <= 3 || st.BlockedItems % 10 == 0)
+                {
+                    Log.Warn(string.Format(
+                        CultureInfo.InvariantCulture,
+                        "[{0}] 封堵物品: {1} 的第 {2} 件（刷物品封堵窗口内）",
+                        AwaWatermark.Owner, target.Nickname, st.BlockedItems));
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Debug("[AWA] 封堵物品失败: " + e.Message);
+            }
+        }
         /// <summary>记录玩家进入房间的时刻 —— 反应时间检测的基准。</summary>
         private void OnRoomChanged(RoomChangedEventArgs ev)
         {

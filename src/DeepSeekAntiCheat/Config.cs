@@ -124,6 +124,43 @@ namespace DeepSeekAntiCheat
         [Description("是否检测命中隐身（SCP-268）目标。可靠性中等：正常玩家看不到隐身目标，但流弹可能误中。")]
         public bool DetectInvisibleTargetHits { get; set; } = true;
 
+        // ───────────── 透视预判检测 ─────────────
+
+        [Description(
+            "是否启用【透视预判】检测。\n" +
+            "原理：透视玩家的准星总是提前对着他看不见的敌人。\n" +
+            "服务端看不到渲染，但能看到「准星朝向」和「敌人在哪个房间」，\n" +
+            "所以可以统计「瞄着一个不同房间里的敌人」的次数。\n" +
+            "偶尔几次是运气或预瞄，次数多了就不正常。")]
+        public bool DetectEspPrediction { get; set; } = true;
+
+        [Description("准星方向与敌人方向夹角小于这个值，算「瞄着」。单位：度。")]
+        public float EspPredictionAngle { get; set; } = 8f;
+
+        [Description("超过这个距离的敌人不计入（太远了瞄着也没意义）。单位：米。")]
+        public float EspPredictionMaxDistance { get; set; } = 60f;
+
+        [Description("统计窗口。单位：秒。")]
+        public int EspPredictionWindowSeconds { get; set; } = 30;
+
+        [Description("窗口内「瞄着看不见的敌人」达到这个次数 → 记为可疑。")]
+        public int EspPredictionThreshold { get; set; } = 12;
+
+        [Description(
+            "窗口内达到这个次数 → 升为硬违规（送 AI 复核的门槛会降低）。\n" +
+            "建议设得比上面高一些，避免误伤习惯预瞄的玩家。")]
+        public int EspPredictionHard { get; set; } = 25;
+
+        // ───────────── 刷物品封堵 ─────────────
+
+        [Description(
+            "检测到刷物品后，是否在接下来一段时间里【持续收掉】新获得的物品。\n" +
+            "关掉的话只清一次背包，但作弊者继续刷还是会拿到东西。")]
+        public bool BlockItemsAfterSpam { get; set; } = true;
+
+        [Description("封堵持续多少秒。")]
+        public int ItemSpamBlockSeconds { get; set; } = 15;
+
         [Description("是否检测 NoClip。这是服务端直接可读的状态位，几乎零误报，建议保持开启。")]
         public bool DetectNoclip { get; set; } = true;
 

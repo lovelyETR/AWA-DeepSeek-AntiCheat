@@ -333,6 +333,36 @@ namespace DeepSeekAntiCheat
                 // 窗口内刷物品是物理上不可能的行为 —— 升为硬违规，绕过样本门槛
                 r.HardViolations.Add(msg + " —— 正常玩家不可能在这么短时间里拿到这么多物品");
             }
+
+            // ── 14. 透视预判（瞄着看不见的敌人）──
+            // 服务端看不到渲染，但能看到「准星朝向」和「敌人在哪个房间」。
+            // 透视玩家的准星会持续提前对准他看不见的敌人 —— 偶尔是运气，多了就不正常。
+            if (cfg.DetectEspPrediction && s.PredictionsInWindow > 0)
+            {
+                float th = Math.Max(1f, cfg.EspPredictionThreshold);
+                float hd = Math.Max(th + 1f, cfg.EspPredictionHard);
+
+                if (s.PredictionsInWindow >= th)
+                {
+                    float w = Ramp(s.PredictionsInWindow, th, hd);
+                    float pts = 30f * w;
+                    r.Score += pts;
+
+                    string msg = string.Format(
+                        CultureInfo.InvariantCulture,
+                        "预判异常: {0} 秒内 {1} 次瞄准看不见的敌人（阈值 {2}，最长连续 {3} 次）",
+                        cfg.EspPredictionWindowSeconds, s.PredictionsInWindow,
+                        cfg.EspPredictionThreshold, s.MaxPredictionStreak);
+
+                    r.Reasons.Add(msg + string.Format(CultureInfo.InvariantCulture, "，+{0:F1}", pts));
+
+                    // 次数远超阈值时升为硬违规 —— 这个次数不可能是运气
+                    if (s.PredictionsInWindow >= hd)
+                    {
+                        r.HardViolations.Add(msg + " —— 这个次数已经超出预瞄和运气的范围");
+                    }
+                }
+            }
             else if (s.SuspiciousItemCount > 0)
             {
                 float pts = Math.Min(15f, 8f * s.SuspiciousItemCount);
@@ -419,6 +449,10 @@ namespace DeepSeekAntiCheat
             sb.Append("\"abnormal_heals\":").Append(s.AbnormalHealCount).Append(',');
             sb.Append("\"suspicious_items\":").Append(s.SuspiciousItemCount).Append(',');
             sb.Append("\"item_spam_detected\":").Append(s.ItemSpamDetected ? "true" : "false").Append(',');
+            sb.Append("\"esp_prediction_count\":").Append(s.PredictionCount).Append(',');
+            sb.Append("\"esp_prediction_in_window\":").Append(s.PredictionsInWindow).Append(',');
+            sb.Append("\"esp_prediction_streak\":").Append(s.MaxPredictionStreak).Append(',');
+            sb.Append("\"blocked_items\":").Append(s.BlockedItems).Append(',');
             sb.Append("\"fast_reactions\":").Append(s.FastReactionCount).Append(',');
             sb.Append("\"fastest_reaction_ms\":").Append(F(s.FastestReactionMs)).Append(',');
 
