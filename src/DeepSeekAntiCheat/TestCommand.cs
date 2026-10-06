@@ -50,8 +50,10 @@ namespace DeepSeekAntiCheat
             "ai <场景id>",
             "stats",
             "panel [玩家名]",
+#if AWA_EDITION_PRIVATE
             "drill list",
             "drill <id> [执行者] [射击目标]",
+#endif
             "report",
             "follow <玩家>",
             "unfollow <玩家>",
@@ -120,15 +122,9 @@ namespace DeepSeekAntiCheat
                 case "panel":
                     return TogglePanel(plugin, args, sender, out response);
 
-                case "drill":
 #if AWA_EDITION_PRIVATE
+                case "drill":
                     return RunDrill(plugin, args, sender, out response);
-#else
-                    // 这个版本不带注入能力 —— 需要测试请用独立的反作弊测试插件
-                    response = "本版本不包含真实性钻取功能。" + "\n" +
-                               "它不含任何注入能力，这是有意为之。" + "\n\n" +
-                               "需要在测试服上验检测？装独立的 AWA 反作弊测试插件。";
-                    return false;
 #endif
 
                 case "report":
