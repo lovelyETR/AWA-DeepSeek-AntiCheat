@@ -13,7 +13,7 @@
     <Company>AWA</Company>
     <Product>DeepSeekAntiCheat ($(AwaEdition))</Product>
     <Copyright>$(AwaNotice)</Copyright>
-    <Description>AWA :: DeepSeekAntiCheat [$(AwaEdition)] —— SCP: Secret Laboratory 的 EXILED 反作弊插件（DeepSeek 辅助）。</Description>
+    <Description>秘密实验室首个接入 AI 的反作弊系统 —— AWA :: DeepSeekAntiCheat [$(AwaEdition)]，SCP: Secret Laboratory 的 EXILED 反作弊插件（DeepSeek AI 复核）。</Description>
     <Authors>AWA</Authors>
     <DebugType>none</DebugType>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
