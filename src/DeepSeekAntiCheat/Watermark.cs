@@ -33,27 +33,40 @@ namespace DeepSeekAntiCheat
         /// <summary>版本号。Alpha 用英文标注。</summary>
         internal const string EditionVersion = "Alpha v1.1";
 
+        /// <summary>对外显示的名字（和仓库名一致）。</summary>
+        internal const string DisplayName = "AWA-DeepSeek-AntiCheat";
+
         /// <summary>项目名。</summary>
         internal const string Project = "DeepSeekAntiCheat";
 
-        /// <summary>版本标识（由编译开关 AwaEdition 决定）。</summary>
+        /// <summary>
+        /// 对外展示的版本标识。
+        ///
+        /// 只有一个公开版本，显示的就是版本号本身；
+        /// 本地构建加个「本地」后缀，方便自己一眼区分，不对外。
+        /// </summary>
 #if AWA_EDITION_PRIVATE
-        internal const string Edition = "自用版";
+        internal const string Edition = "本地";
 #else
-        internal const string Edition = "公共版";
+        internal const string Edition = "";
 #endif
+
+        /// <summary>横幅里方括号内显示的内容。</summary>
+        internal static string EditionTag =>
+            string.IsNullOrEmpty(Edition) ? EditionVersion : EditionVersion + "  " + Edition;
+
+        /// <summary>
+        /// 完整版本标识 —— 对外统一用这个格式：
+        ///     AWA-DeepSeek-AntiCheat  Alpha v1.1
+        /// </summary>
+        internal static string Title => DisplayName + "  " + EditionTag;
 
         /// <summary>
         /// 署名说明。
         /// 两个版本共用同一份逻辑代码，只有这一行文案不同 ——
         /// 由 csproj 的 AwaEdition 开关控制，避免维护两套源码。
         /// </summary>
-#if AWA_EDITION_PRIVATE
-        internal const string Notice = "AWA 自用版";
-#else
-        internal const string Notice =
-            "作者：AWA　　本插件全由 DSH 开发";
-#endif
+        internal const string Notice = "作者：AWA　　本插件全由 DSH 开发";
 
         /// <summary>
         /// 水印碎片。分散摆放，拼起来是 AWA。
@@ -152,7 +165,7 @@ namespace DeepSeekAntiCheat
         internal static string Banner =>
             "\n" +
             "  ╔══════════════════════════════════════════════════════════╗\n" +
-            "  ║   " + Owner + "  ::  " + Project + "  [" + Edition + "  " + EditionVersion + "]\n" +
+            "  ║   " + Title + "\n" +
             "  ║   " + Notice + "\n" +
             "  ╚══════════════════════════════════════════════════════════╝";
 

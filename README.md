@@ -2,6 +2,8 @@
 
 # AWA-DeepSeek-AntiCheat
 
+## Alpha v1.1
+
 ## 🔒 秘密实验室首个接入 AI 的反作弊系统
 
 SCP: Secret Laboratory 服务端反作弊插件（EXILED / LabAPI）
@@ -265,18 +267,18 @@ git clone https://github.com/lovelyETR/AWA-DeepSeek-AntiCheat.git
 cd AWA-DeepSeek-AntiCheat
 
 # 反作弊插件
-dotnet build src/DeepSeekAntiCheat -c Release -p:AwaEdition=Public   # 公共版
-dotnet build src/DeepSeekAntiCheat -c Release -p:AwaEdition=Private  # 自用版
+dotnet build src/DeepSeekAntiCheat -c Release -p:AwaEdition=Public   # 正式版
+dotnet build src/DeepSeekAntiCheat -c Release -p:AwaEdition=Private  # 本地构建
 
 # 测试插件
 dotnet build src/AwaCheatLab -c Release
 ```
 
-**反作弊插件的两个版本**（用编译开关分叉，逻辑代码相同）：
+**构建说明**：
 
 | | `Private` | `Public` |
 |---|---|---|
-| 署名 | `AWA 自用版` | `作者：AWA / 本插件全由 DSH 开发` |
+
 | 默认处置 | `Kill`（只处死）| `Ban`（递进阶梯）|
 | `.dsac drill` 命令 | 有 | 无（不含注入能力）|
 

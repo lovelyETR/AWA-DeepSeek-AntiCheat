@@ -62,7 +62,7 @@ namespace DeepSeekAntiCheat
             ServerFeatures f = cfg.Features ?? new ServerFeatures();
             var sb = new StringBuilder();
 
-            sb.AppendLine("AWA 反作弊插件  " + AwaWatermark.EditionVersion + "  [" + AwaWatermark.Edition + "]");
+            sb.AppendLine(AwaWatermark.Title);
             sb.AppendLine();
             sb.AppendLine("服务器特性白名单（当前生效的配置）");
             sb.AppendLine();

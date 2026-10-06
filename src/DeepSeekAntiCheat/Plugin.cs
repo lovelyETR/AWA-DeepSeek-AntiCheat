@@ -616,7 +616,7 @@ namespace DeepSeekAntiCheat
             // 启动时把「生效的处置方式」打出来 —— 免得改错配置自己不知道
             Log.Warn(string.Format(
                 CultureInfo.InvariantCulture,
-                "[{0}] 版本 {1}    生效处置: {2}    递进处置: {3}",
+                "{0}    生效处置: {1}    递进处置: {2}",
                 AwaWatermark.Owner,
                 AwaWatermark.EditionVersion,
                 this.Config.Action,
