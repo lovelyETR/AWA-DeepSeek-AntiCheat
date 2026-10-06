@@ -25,10 +25,6 @@ namespace DeepSeekAntiCheat
         /// <summary>水印标识。</summary>
         internal const string Owner = "AWA";
 
-#if !AWA_EDITION_PRIVATE
-        /// <summary>开发者。只有公共版的署名与自检需要它。</summary>
-        internal const string Developer = "DSH";
-#endif
 
         /// <summary>版本号。Alpha 用英文标注。</summary>
         internal const string EditionVersion = "Alpha v1.1";
@@ -45,11 +41,7 @@ namespace DeepSeekAntiCheat
         /// 只有一个公开版本，显示的就是版本号本身；
         /// 本地构建加个「本地」后缀，方便自己一眼区分，不对外。
         /// </summary>
-#if AWA_EDITION_PRIVATE
-        internal const string Edition = "本地";
-#else
         internal const string Edition = "";
-#endif
 
         /// <summary>横幅里方括号内显示的内容。</summary>
         internal static string EditionTag =>
@@ -118,12 +110,6 @@ namespace DeepSeekAntiCheat
                 return "署名说明被清空";
             }
 
-#if !AWA_EDITION_PRIVATE
-            if (Notice.IndexOf(Developer, StringComparison.Ordinal) < 0)
-            {
-                return "署名说明被修改（少了开发者署名）";
-            }
-#endif
 
             // 3) 碎片拼装后是否仍能还原出水印标识
             string rebuilt = string.Concat(Fragments);

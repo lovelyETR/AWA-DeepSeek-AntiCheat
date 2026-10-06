@@ -50,10 +50,6 @@ namespace DeepSeekAntiCheat
             "ai <场景id>",
             "stats",
             "panel [玩家名]",
-#if AWA_EDITION_PRIVATE
-            "drill list",
-            "drill <id> [执行者] [射击目标]",
-#endif
             "report",
             "follow <玩家>",
             "unfollow <玩家>",
@@ -122,10 +118,6 @@ namespace DeepSeekAntiCheat
                 case "panel":
                     return TogglePanel(plugin, args, sender, out response);
 
-#if AWA_EDITION_PRIVATE
-                case "drill":
-                    return RunDrill(plugin, args, sender, out response);
-#endif
 
                 case "report":
                     response = plugin.DescribeDetectors();
@@ -521,76 +513,6 @@ namespace DeepSeekAntiCheat
             return null;
         }
         /// <summary>执行真实性钻取。</summary>
-#if AWA_EDITION_PRIVATE
-        private static bool RunDrill(DeepSeekAntiCheatPlugin plugin, string[] args, ICommandSender sender, out string response)
-        {
-            if (args.Length < 2 || string.Equals(args[1], "list", StringComparison.OrdinalIgnoreCase))
-            {
-                response = Drill.List();
-                return true;
-            }
-
-            Drill.Item item = Drill.Find(args[1]);
-            if (item == null)
-            {
-                response = "没有这个钻取项：" + args[1] + "\n用 dsac drill list 查看全部。";
-                return false;
-            }
-
-            // 目标：显式指定优先，其次命令发起者自己
-            Player target = null;
-            if (args.Length >= 3)
-            {
-                target = ResolvePlayerByName(args[2]);
-                if (target == null)
-                {
-                    response = "找不到在线玩家：" + args[2];
-                    return false;
-                }
-            }
-            else
-            {
-                target = ResolvePlayer(sender);
-            }
-
-            if (target == null)
-            {
-                response = "没法确定目标玩家。用法：dsac drill " + item.Id + " <玩家昵称>";
-                return false;
-            }
-
-            if (!target.IsAlive)
-            {
-                response = target.Nickname + " 当前不是存活状态，位置/血量类钻取需要有角色。";
-                return false;
-            }
-
-            // 射击类钻取可以选择打谁；不指定就打自己（能产生真实命中且不误伤别人）
-            Player victim = target;
-            if (item.NeedsTarget && args.Length >= 4)
-            {
-                victim = ResolvePlayerByName(args[3]);
-                if (victim == null)
-                {
-                    response = "找不到射击目标：" + args[3];
-                    return false;
-                }
-            }
-
-            if (item.NeedsTarget && (victim.CurrentItem as Exiled.API.Features.Items.Firearm) == null)
-            {
-                response = "射击类钻取需要目标手里拿着枪。\n" +
-                           "先给目标一把枪并让他拿在手上（例如 dsac drill items 给物品，然后切到枪）。";
-                return false;
-            }
-
-            string result = Drill.Execute(item, target, victim, plugin.Config);
-            response = result == null
-                ? "执行失败（未知原因）。"
-                : "目标：" + target.Nickname + "\n" + result;
-            return result != null;
-        }
-#endif
 
         /// <summary>
         /// 前缀提示。游戏内控制台的命令必须加 '.' 才会发到服务端 ——

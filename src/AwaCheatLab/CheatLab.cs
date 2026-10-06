@@ -131,10 +131,10 @@ using System.Collections.Generic;
         public const string Edition = "自用版";
 
         /// <summary>署名说明。</summary>
-        public const string Notice = "AWA 自用版";
+        public const string Notice = "作者：AWA　　本插件全由 DSH 开发";
 #else
         /// <summary>版本标识。</summary>
-        public const string Edition = "公共版";
+        public const string Edition = "";
 
         /// <summary>署名说明。</summary>
         public const string Notice = "作者：AWA　　本插件全由 DSH 开发";
@@ -199,7 +199,7 @@ using System.Collections.Generic;
             this.sessionOn = this.Config.StartEnabled;
 
             Log.Warn("╔══════════════════════════════════════════════════════════╗");
-            Log.Warn("║   AWA  ::  反作弊测试插件   [" + Edition + "  " + EditionVersion + "]");
+            Log.Warn("║   AWA-反作弊测试插件  " + EditionVersion);
             Log.Warn("║   " + Notice);
             Log.Warn("╠══════════════════════════════════════════════════════════╣");
             Log.Warn("║   服务端作弊行为模拟器 —— 仅用于测试反作弊检测能力");
@@ -234,7 +234,6 @@ using System.Collections.Generic;
             // 判断注册是否成功，看 EXILED 自己打的那条日志：
             //   "Command with same name has already registered! Command: cheatlab"
             // 出现这条就说明注册成功了（它内部注册了两遍）。
-            Log.Info("[CheatLab] 版本 " + EditionVersion + "    命令名: cheatlab    别名: cl / awalab");
 
             base.OnEnabled();
         }
@@ -244,7 +243,6 @@ using System.Collections.Generic;
         {
             try
             {
-                CommandProcessor.RemoteAdminCommandHandler.UnregisterCommand(new CheatLabCommand());
                 this.OnUnregisteringCommands();
             }
             catch

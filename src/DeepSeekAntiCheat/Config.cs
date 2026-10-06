@@ -221,13 +221,8 @@ namespace DeepSeekAntiCheat
         public int HardViolationThreshold { get; set; } = 50;
 
         [Description("处置方式：Alert=只通报管理员 / Kick=踢出 / Ban=封禁。强烈建议先用 Alert 观察一段时间。")]
-#if AWA_EDITION_PRIVATE
-        // 自用版：只处死，不封禁 —— 你在自己服上测试用，误判也无所谓
-        public VerdictAction Action { get; set; } = VerdictAction.Kill;
-#else
-        // 公共版：走递进处置 —— 前几次处死，后面才开始封
+        // 默认走递进处置 —— 前几次处死，后面才开始封
         public VerdictAction Action { get; set; } = VerdictAction.Ban;
-#endif
 
         [Description("封禁时长（天）。仅当 Action=Ban 且「递进封禁」关闭时使用。")]
         public int BanDurationDays { get; set; } = 7;
