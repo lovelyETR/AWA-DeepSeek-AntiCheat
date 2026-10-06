@@ -161,6 +161,44 @@ namespace DeepSeekAntiCheat
         [Description("封堵持续多少秒。")]
         public int ItemSpamBlockSeconds { get; set; } = 15;
 
+        [Description(
+            "【与服务器插件共存】服务器会把物品当奖励/补给发出去的物品类型关键词。\n" +
+            "命中关键词的物品不计入刷物品、也不会被封堵。\n" +
+            "默认放过常见的补给类：钥匙卡、弹药、护甲、医疗品、SCP 道具。")]
+        public List<string> ItemSpamIgnoreTypes { get; set; } = new List<string>
+        {
+            "Keycard", "Ammo", "Armor", "Medkit", "Painkillers", "Adrenaline",
+            "SCP500", "SCP207", "SCP268", "Radio", "Flashlight", "Coin", "Grenade",
+        };
+
+        [Description(
+            "【与服务器插件共存】玩家出生后的这段秒数内不计刷物品。\n" +
+            "很多服务器插件会在出生瞬间发放整套装备，那不是作弊。")]
+        public float ItemSpamSpawnGraceSeconds { get; set; } = 10f;
+
+        // ───────────── 武器与投射物一致性 ─────────────
+
+        [Description(
+            "是否检测【武器打出来的东西对不对】。\n" +
+            "例如拿机枪却打出榴弹的伤害。\n" +
+            "做法：比较「武器自己声明的伤害」与「实际造成的伤害」。\n" +
+            "因为比的是武器自身的当前数值，服务器插件改过武器也不会误报。")]
+        public bool DetectAmmoMismatch { get; set; } = true;
+
+        [Description(
+            "实际伤害超过武器声明伤害这么多倍算异常。\n" +
+            "默认 2.5 倍 —— 留了足够余量，正常武器波动不会碰到。")]
+        public float AmmoMismatchDamageRatio { get; set; } = 2.5f;
+
+        [Description("实际伤害低于这个值就不判（避免小误差与护甲减伤）。")]
+        public float AmmoMismatchMinDamage { get; set; } = 60f;
+
+        [Description(
+            "【与服务器插件共存】点名豁免的武器名关键词（不区分大小写）。\n" +
+            "你的服如果做了自定义武器（例如把机枪改成榴弹炮），\n" +
+            "把那个武器名填进来就完全跳过这项检测。")]
+        public List<string> AmmoMismatchIgnoreFirearms { get; set; } = new List<string>();
+
         [Description("是否检测 NoClip。这是服务端直接可读的状态位，几乎零误报，建议保持开启。")]
         public bool DetectNoclip { get; set; } = true;
 

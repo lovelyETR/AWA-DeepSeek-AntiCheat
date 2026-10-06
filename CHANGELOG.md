@@ -5,7 +5,7 @@
 
 ---
 
-## [AWA-DeepSeek-AntiCheat  Alpha v1.1] —— 首个公开版本
+## [AWA-DeepSeek-AntiCheat  Alpha v1.2] —— 首个公开版本
 
 ### 反作弊插件 `DeepSeekAntiCheat`
 

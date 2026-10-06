@@ -2,7 +2,7 @@
 
 # AWA-DeepSeek-AntiCheat
 
-## Alpha v1.1
+## Alpha v1.2
 
 ## 🔒 秘密实验室首个接入 AI 的反作弊系统
 

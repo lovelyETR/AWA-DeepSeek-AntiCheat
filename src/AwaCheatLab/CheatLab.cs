@@ -121,7 +121,7 @@ using System.Collections.Generic;
         public static CheatLabPlugin Instance { get; private set; }
 
         /// <summary>版本号。Alpha 用英文标注。</summary>
-        public const string EditionVersion = "Alpha v1.1";
+        public const string EditionVersion = "Alpha v1.2";
 
         /// <summary>运行时开关 —— cl on / cl off 切这个，不用重启。</summary>
         private bool sessionOn;

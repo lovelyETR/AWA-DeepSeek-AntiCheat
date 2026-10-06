@@ -334,6 +334,22 @@ namespace DeepSeekAntiCheat
                 r.HardViolations.Add(msg + " —— 正常玩家不可能在这么短时间里拿到这么多物品");
             }
 
+            // ── 14. 武器与投射物不符（拿机枪打出榴弹的伤害）──
+            // 比的是「武器自己声明的伤害」，服务器插件改过武器也不会误报。
+            if (cfg.DetectAmmoMismatch && s.AmmoMismatchCount > 0)
+            {
+                float pts = Math.Min(45f, 25f + (s.AmmoMismatchCount - 1) * 10f);
+                r.Score += pts;
+
+                string wmsg = string.IsNullOrEmpty(s.AmmoMismatchDetail)
+                    ? "武器打出来的东西与武器本身不符"
+                    : s.AmmoMismatchDetail;
+
+                r.Reasons.Add(wmsg + string.Format(CultureInfo.InvariantCulture, "，+{0:F1}", pts));
+
+                // 第一次就已经远超武器声明值 —— 这不是波动能解释的
+                r.HardViolations.Add(wmsg);
+            }
             // ── 14. 透视预判（瞄着看不见的敌人）──
             // 服务端看不到渲染，但能看到「准星朝向」和「敌人在哪个房间」。
             // 透视玩家的准星会持续提前对准他看不见的敌人 —— 偶尔是运气，多了就不正常。
@@ -452,6 +468,8 @@ namespace DeepSeekAntiCheat
             sb.Append("\"esp_prediction_count\":").Append(s.PredictionCount).Append(',');
             sb.Append("\"esp_prediction_in_window\":").Append(s.PredictionsInWindow).Append(',');
             sb.Append("\"esp_prediction_streak\":").Append(s.MaxPredictionStreak).Append(',');
+            sb.Append("\"blocked_items\":").Append(s.BlockedItems).Append(',');
+            sb.Append("\"ammo_mismatch_count\":").Append(s.AmmoMismatchCount).Append(',');
             sb.Append("\"blocked_items\":").Append(s.BlockedItems).Append(',');
             sb.Append("\"fast_reactions\":").Append(s.FastReactionCount).Append(',');
             sb.Append("\"fastest_reaction_ms\":").Append(F(s.FastestReactionMs)).Append(',');

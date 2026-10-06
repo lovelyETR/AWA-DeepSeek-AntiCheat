@@ -113,6 +113,15 @@ namespace DeepSeekAntiCheat
         /// <summary>检测到刷物品后，在这个时刻之前新获得的物品全部收掉。</summary>
         public DateTime ItemSpamBlockedUntil { get; set; } = DateTime.MinValue;
 
+        /// <summary>本次出生的时刻（用于「出生后宽限期」）。</summary>
+        public DateTime SpawnedAt { get; set; } = DateTime.MinValue;
+
+        /// <summary>武器与伤害不符的次数。</summary>
+        public int AmmoMismatchCount { get; set; }
+
+        /// <summary>武器与伤害不符的详情。</summary>
+        public string AmmoMismatchDetail { get; set; }
+
         /// <summary>被封堵收掉的物品件数。</summary>
         public int BlockedItems { get; set; }
 

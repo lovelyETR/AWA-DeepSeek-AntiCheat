@@ -785,6 +785,34 @@ namespace DeepSeekAntiCheat
             PlayerStats st = this.GetStats(ev.Player);
             st.RecordShot();
 
+            // ── 武器与投射物一致性 ──
+            // 拿机枪却打出榴弹的伤害 —— 比的是「武器自己声明的伤害」，
+            // 所以服务器插件改过武器也不会误报（见 WeaponCheck.cs）。
+            if (this.Config.DetectAmmoMismatch && ev.Target != null)
+            {
+                try
+                {
+                    WeaponCheck.Result wc = WeaponCheck.Check(this.Config, ev.Player, ev.Damage);
+                    if (wc.Suspicious)
+                    {
+                        st.AmmoMismatchCount++;
+                        st.AmmoMismatchDetail = wc.Detail;
+
+                        st.LogEvent("武器异常", wc.Detail);
+                        Log.Warn(string.Format(
+                            CultureInfo.InvariantCulture,
+                            "[{0}] {1} —— {2}",
+                            AwaWatermark.Owner, ev.Player.Nickname, wc.Detail));
+
+                        this.MaybeReview(st);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Debug("[AWA] 武器一致性检查失败: " + e.Message);
+                }
+            }
+
             // Target 为 null 表示没打中人
             if (ev.Target != null)
             {
@@ -1270,11 +1298,46 @@ namespace DeepSeekAntiCheat
 
             PlayerStats st = this.GetStats(ev.Player);
 
+            // ── 与服务器插件共存：这些物品不算刷物品，也不封堵 ──
+            // 很多服务器插件会把钥匙卡/弹药/护甲/医疗品当补给发出去。
+            string curItem = string.Empty;
+            try
+            {
+                if (ev.Item != null)
+                {
+                    curItem = ev.Item.Type.ToString();
+                }
+            }
+            catch
+            {
+                // 拿不到名字就当普通物品
+            }
+
+            bool ignored = this.IsItemSpamIgnored(curItem);
+
+            // 出生后宽限期内不计（服务器插件常在出生瞬间发整套装备）
+            bool inGrace = false;
+            if (this.Config.ItemSpamSpawnGraceSeconds > 0f && st.SpawnedAt != DateTime.MinValue)
+            {
+                inGrace = (DateTime.UtcNow - st.SpawnedAt).TotalSeconds < this.Config.ItemSpamSpawnGraceSeconds;
+            }
+
             // ── 封堵窗口：刚判定过刷物品，接下来一段时间里新拿到的物品直接收掉 ──
             // 否则「清空背包」只清那一瞬间，作弊者接着刷还是能拿到东西。
             if (this.Config.BlockItemsAfterSpam && DateTime.UtcNow < st.ItemSpamBlockedUntil)
             {
-                this.BlockItem(ev.Player, ev.Item, st);
+                // 豁免物品照常放行（服务器插件的补给不该被收）
+                if (!ignored)
+                {
+                    this.BlockItem(ev.Player, ev.Item, st);
+                    return;
+                }
+            }
+
+            // 出生宽限期 / 豁免物品 —— 照常记录，但不参与刷物品判定
+            if (ignored || inGrace)
+            {
+                st.RecordItem(this.Config.ItemSpamWindowSeconds);
                 return;
             }
 
@@ -1371,6 +1434,37 @@ namespace DeepSeekAntiCheat
             {
                 Log.Error("[AWA] 清空背包失败: " + e.Message);
             }
+        }
+
+        /// <summary>
+        /// 这个物品类型是不是「服务器插件常发的补给」。
+        ///
+        /// 命中就不计入刷物品、也不会被封堵 —— 避免和发物品的服务器插件冲突。
+        /// 名单在配置里（item_spam_ignore_types），可以按自己的服调整。
+        /// </summary>
+        private bool IsItemSpamIgnored(string itemTypeName)
+        {
+            if (string.IsNullOrEmpty(itemTypeName))
+            {
+                return false;
+            }
+
+            List<string> list = this.Config.ItemSpamIgnoreTypes;
+            if (list == null)
+            {
+                return false;
+            }
+
+            foreach (string key in list)
+            {
+                if (!string.IsNullOrWhiteSpace(key)
+                    && itemTypeName.IndexOf(key.Trim(), StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -1477,6 +1571,19 @@ namespace DeepSeekAntiCheat
             if (ev?.Player != null)
             {
                 this.movement.Forget(ev.Player.UserId);
+
+                // 记下出生时刻：服务器插件常在出生瞬间发整套装备，
+                // 那段时间内不计刷物品（见 ItemSpamSpawnGraceSeconds）。
+                try
+                {
+                    PlayerStats sst = this.GetStats(ev.Player);
+                    sst.SpawnedAt = DateTime.UtcNow;
+                    sst.ItemSpamBlockedUntil = DateTime.MinValue;
+                }
+                catch
+                {
+                    // 记录失败不影响主流程
+                }
             }
         }
 

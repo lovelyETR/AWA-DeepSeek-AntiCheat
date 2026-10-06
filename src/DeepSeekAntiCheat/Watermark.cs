@@ -27,7 +27,7 @@ namespace DeepSeekAntiCheat
 
 
         /// <summary>版本号。Alpha 用英文标注。</summary>
-        internal const string EditionVersion = "Alpha v1.1";
+        internal const string EditionVersion = "Alpha v1.2";
 
         /// <summary>对外显示的名字（和仓库名一致）。</summary>
         internal const string DisplayName = "AWA-DeepSeek-AntiCheat";
